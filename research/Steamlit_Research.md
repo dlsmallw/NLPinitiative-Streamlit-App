@@ -61,3 +61,12 @@ streamlit run <app_name>.py
             st.subheader('Raw data')
             st.write(data)
         ```
+
+## Applications for Project:
+### Caching:
+ - st.cache_data:
+    - Only really useful for serializing computational data (function results)
+ - st.cache_resource:
+    - Useful for storing NLP model globally
+    - Stores unserializable data (like models) and loads it once
+        - Do not need to worry about having to load the model multiple times across sessions since it is stored and accessible to all sessions
