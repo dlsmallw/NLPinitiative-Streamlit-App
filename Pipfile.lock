@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "c16e5f3fc76a1450c8e733093365a95a5f7d169ef54be7e83124c7fa917855da"
+            "sha256": "b114c11edb911ee8c918ef91522f2a4e6895019b452b37a052da3b4deb4c456e"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -185,6 +185,13 @@
             ],
             "markers": "python_version >= '3.7'",
             "version": "==3.1.44"
+        },
+        "htbuilder": {
+            "hashes": [
+                "sha256:58c0bc5502c1a46b42ae9e074c43ec0f6fdc24ed334936cb17e1ed5a8938aee2"
+            ],
+            "markers": "python_version >= '3.7'",
+            "version": "==0.9.0"
         },
         "idna": {
             "hashes": [
@@ -749,6 +756,15 @@
             ],
             "markers": "python_version >= '3.7'",
             "version": "==5.0.2"
+        },
+        "st-annotated-text": {
+            "hashes": [
+                "sha256:712c45821f020eccafad3a58c10b9d2d51d449f4db999a06308ecf39a753a4df",
+                "sha256:b0134dcf734697cc3dbdb11862c4174071e7fb6f365af55a37c710d357fd88a5"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.5'",
+            "version": "==4.0.2"
         },
         "streamlit": {
             "hashes": [
