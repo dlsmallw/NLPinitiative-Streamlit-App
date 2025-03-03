@@ -1,9 +1,27 @@
 import streamlit as st
+import pandas as pd
 from annotated_text import annotated_text, annotation
 import time
 from random import randint, uniform
 
-results_container = None
+history_df = pd.DataFrame(data=[], columns=['Text', 'Classification', 'Gender', 'Race', 'Sexuality', 'Disability', 'Religion', 'Unspecified'])
+
+def extract_data(json_obj):
+    row_data = []
+
+    row_data.append(json_obj['raw_text'])
+    row_data.append(json_obj['text_sentiment'])
+    cat_dict = json_obj['category_sentiments']
+    for cat in cat_dict.keys():
+        raw_val = cat_dict[cat]
+        val = f'{raw_val * 100: .2f}%' if raw_val is not None else 'N/A'
+        row_data.append(val)
+    
+    return row_data
+
+def load_history():
+    for result in st.session_state.results:
+        history_df.loc[len(history_df)] = extract_data(result)
 
 def output_results(res):
     label_dict = {
@@ -13,10 +31,11 @@ def output_results(res):
         'Disability': '#8B5E3C',
         'Religion': '#A347BA',  
         'Unspecified': '#A0A0A0'
-
     }
+
     with rc:
-        with st.chat_message(name = 'human', avatar=None):
+        st.markdown('### Results')
+        with st.container(border=True):
             at_list = []
             if res['numerical_sentiment'] == 1:
                 # st.markdown('##### Category Results:')
@@ -64,13 +83,36 @@ def analyze_text(text):
 
     if res is not None:
         st.session_state.results.append(res)
+        history_df.loc[-1] = extract_data(res)
         output_results(res)
 
-pri_container = st.container()
-cols = pri_container.columns([1, 8, 1])
-cols[1].subheader('NLPinitiative - Discriminatory Text Classifier')
+st.title('NLPinitiative Text Classifier')
+tab1, tab2 = st.tabs(['Classifier', 'About This App'])
 
-with pri_container.expander('About This Application'):
+if "results" not in st.session_state:
+    st.session_state.results = []
+    
+load_history()
+
+with tab1:
+    "Text Classifier for determining if entered text is discriminatory (and the categories of discrimination) or Non-Discriminatory."
+
+    with st.container():
+        with st.expander('History'):
+            st.write(history_df)
+
+        rc = st.container()
+
+    text_form = st.form(key='classifier', clear_on_submit=True, enter_to_submit=True)
+    with text_form:
+        text_area = st.text_area('Enter text to classify')
+        form_btn = st.form_submit_button('submit')
+
+        if entry := text_area:
+            analyze_text(entry)
+
+
+with tab2:
     st.markdown(
     """The NLPinitiative Discriminatory Text Classifier is an advanced 
     natural language processing tool designed to detect and flag potentially 
@@ -81,18 +123,3 @@ with pri_container.expander('About This Application'):
     valuable insights, we encourage users to review flagged content thoughtfully 
     and consider context when interpreting results."""
 )
-
-st.divider()
-
-chat_container = st.container()
-rc = chat_container.container(height=500)
-
-if "results" not in st.session_state:
-    st.session_state.results = []
-
-with rc:
-    for result in st.session_state.results:
-        output_results(result)
-
-if entry := chat_container.chat_input('Enter text to classify'):
-    analyze_text(entry)
