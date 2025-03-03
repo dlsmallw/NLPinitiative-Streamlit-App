@@ -25,14 +25,16 @@ def output_results(res):
                         val = res['category_sentiments'][entry]
                         perc = val * 100
                         at_list.append((entry, f'{perc:.2f}%', label_dict[entry]))
-                        at_list.append(' ')
 
             st.markdown(f"#### Text - *\"{res['raw_text']}\"*")
             st.markdown(f"#### Classification - {':red' if res['numerical_sentiment'] == 1 else ':green'}[{res['text_sentiment']}]")
 
             if len(at_list) > 0:
-                # st.html(annotated_text(at_list))
-                annotated_text(at_list)
+                st.markdown('#### Categories: ')
+                cols = st.columns([1, 15])
+                with cols[1]:
+                    for cat in at_list:
+                        annotated_text(cat)
 
 def test_results(text):
     test_val = int(randint(0, 1))
@@ -68,7 +70,8 @@ pri_container = st.container()
 cols = pri_container.columns([1, 8, 1])
 cols[1].subheader('NLPinitiative - Discriminatory Text Classifier')
 
-pri_container.markdown(
+with pri_container.expander('About This Application'):
+    st.markdown(
     """The NLPinitiative Discriminatory Text Classifier is an advanced 
     natural language processing tool designed to detect and flag potentially 
     discriminatory or harmful language. By analyzing text for biased, offensive, 
@@ -80,7 +83,9 @@ pri_container.markdown(
 )
 
 st.divider()
-rc = st.container()
+
+chat_container = st.container()
+rc = chat_container.container(height=500)
 
 if "results" not in st.session_state:
     st.session_state.results = []
@@ -89,5 +94,5 @@ with rc:
     for result in st.session_state.results:
         output_results(result)
 
-if entry := st.chat_input('Enter text to classify'):
+if entry := chat_container.chat_input('Enter text to classify'):
     analyze_text(entry)
