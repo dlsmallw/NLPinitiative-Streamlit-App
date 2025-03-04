@@ -47,7 +47,6 @@ def output_results(res):
         with st.container(border=True):
             at_list = []
             if res['numerical_sentiment'] == 1:
-                # st.markdown('##### Category Results:')
                 for entry in res['category_sentiments'].keys():
                     val = res['category_sentiments'][entry]
                     if val > 0.0:
