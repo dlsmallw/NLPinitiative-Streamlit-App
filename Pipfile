@@ -8,6 +8,8 @@ streamlit = "*"
 pandas = "*"
 numpy = "*"
 st-annotated-text = "*"
+transformers = "*"
+torch = "*"
 
 [dev-packages]
 

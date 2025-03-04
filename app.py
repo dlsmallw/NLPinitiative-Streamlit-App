@@ -3,8 +3,17 @@ import pandas as pd
 from annotated_text import annotated_text, annotation
 import time
 from random import randint, uniform
+from scripts.predict import InferenceHandler
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[0]
+st.write(ROOT)
+MODELS_DIR = ROOT / 'models'
+BIN_MODEL_PATH = MODELS_DIR / 'binary_classification'
+ML_MODEL_PATH = MODELS_DIR / 'multilabel_regression'
 
 history_df = pd.DataFrame(data=[], columns=['Text', 'Classification', 'Gender', 'Race', 'Sexuality', 'Disability', 'Religion', 'Unspecified'])
+ih = InferenceHandler(BIN_MODEL_PATH, ML_MODEL_PATH)
 
 def extract_data(json_obj):
     row_data = []
@@ -40,8 +49,8 @@ def output_results(res):
             if res['numerical_sentiment'] == 1:
                 # st.markdown('##### Category Results:')
                 for entry in res['category_sentiments'].keys():
-                    if randint(0, 1) == 1:
-                        val = res['category_sentiments'][entry]
+                    val = res['category_sentiments'][entry]
+                    if val > 0.0:
                         perc = val * 100
                         at_list.append((entry, f'{perc:.2f}%', label_dict[entry]))
 
@@ -49,28 +58,25 @@ def output_results(res):
             st.markdown(f"#### Classification - {':red' if res['numerical_sentiment'] == 1 else ':green'}[{res['text_sentiment']}]")
 
             if len(at_list) > 0:
-                st.markdown('#### Categories: ')
-                cols = st.columns([1, 15])
-                with cols[1]:
-                    for cat in at_list:
-                        annotated_text(cat)
+                annotated_text(at_list)
+                        
 
-def test_results(text):
-    test_val = int(randint(0, 1))
-    res_obj = {
-            'raw_text': text,
-            'text_sentiment': 'Discriminatory' if test_val == 1 else 'Non-Discriminatory',
-            'numerical_sentiment': test_val,
-            'category_sentiments': {
-                'Gender': None if test_val == 0 else uniform(0.0, 1.0),
-                'Race': None if test_val == 0 else uniform(0.0, 1.0),
-                'Sexuality': None if test_val == 0 else uniform(0.0, 1.0),  
-                'Disability': None if test_val == 0 else uniform(0.0, 1.0),
-                'Religion': None if test_val == 0 else uniform(0.0, 1.0),  
-                'Unspecified': None if test_val == 0 else uniform(0.0, 1.0)
-            }
-        }
-    return res_obj
+# def test_results(text):
+#     test_val = int(randint(0, 1))
+#     res_obj = {
+#             'raw_text': text,
+#             'text_sentiment': 'Discriminatory' if test_val == 1 else 'Non-Discriminatory',
+#             'numerical_sentiment': test_val,
+#             'category_sentiments': {
+#                 'Gender': None if test_val == 0 else uniform(0.0, 1.0),
+#                 'Race': None if test_val == 0 else uniform(0.0, 1.0),
+#                 'Sexuality': None if test_val == 0 else uniform(0.0, 1.0),  
+#                 'Disability': None if test_val == 0 else uniform(0.0, 1.0),
+#                 'Religion': None if test_val == 0 else uniform(0.0, 1.0),  
+#                 'Unspecified': None if test_val == 0 else uniform(0.0, 1.0)
+#             }
+#         }
+#     return res_obj
 
 
 def analyze_text(text):
@@ -78,7 +84,7 @@ def analyze_text(text):
     with rc:
         with st.spinner("Processing...", show_time=True) as spnr:
             time.sleep(5)
-            res = test_results(text)
+            res = ih.classify_text(text)
             del spnr
 
     if res is not None:
