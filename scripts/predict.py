@@ -5,30 +5,42 @@ Script file used for performing inference with an existing model.
 from pathlib import Path
 import torch
 import json
+import huggingface_hub
+import joblib
+from huggingface_hub.inference_api import InferenceApi
 
 from transformers import (
     AutoTokenizer,
     AutoModelForSequenceClassification
 )
 
+BIN_REPO = 'dlsmallw/Binary-Classification-testing'
+ML_REPO = 'dlsmallw/Multilabel-Regression-testing'
 
 ## Class used to encapsulate and handle the logic for inference
 class InferenceHandler:
-    def __init__(self, bin_model_path: Path, ml_regr_model_path: Path):
-        self.bin_tokenizer, self.bin_model = self.init_model_and_tokenizer(bin_model_path)
-        self.ml_regr_tokenizer, self.ml_regr_model = self.init_model_and_tokenizer(ml_regr_model_path)
+    def __init__(self, api_token):
+        self.api_token = api_token
+        self.bin_tokenizer, self.bin_model = self.init_model_and_tokenizer(BIN_REPO)
+        self.ml_regr_tokenizer, self.ml_regr_model = self.init_model_and_tokenizer(ML_REPO)
+
+    def get_config(self, repo_id):
+        config = None
+        if repo_id and self.api_token:
+            config = huggingface_hub.hf_hub_download(repo_id, filename='config.json', token=self.api_token)
+        return config
 
     ## Initializes a model and tokenizer for use in inference using the models path
-    def init_model_and_tokenizer(self, model_path: Path):
-        with open(model_path / 'config.json') as config_file:
+    def init_model_and_tokenizer(self, repo_id):
+        config = self.get_config(repo_id)
+        with open(config) as config_file:
             config_json = json.load(config_file)
         model_name = config_json['_name_or_path']
-        model_type = config_json['model_type']
 
         tokenizer = AutoTokenizer.from_pretrained(model_name)
-        model = AutoModelForSequenceClassification.from_pretrained(model_path, model_type=model_type)
-        model.eval()
+        model = AutoModelForSequenceClassification.from_pretrained(repo_id, token=self.api_token)
 
+        model.eval()
         return tokenizer, model
 
     ## Handles logic used to encode the text for use in binary classification
@@ -103,3 +115,15 @@ class InferenceHandler:
             results.append(max(0.0, item))
 
         return results
+
+ih = InferenceHandler('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')
+discr_text = """Islam is hell .  We Asian hate isalm...Islam bring only destruction..killing.  rape... rufugee.... Islam is hell .. Asian thought √∞¬ü¬ò¬Ç√∞¬ü¬ò¬Çsorry...but is true"""
+
+nondiscr_text = """Absolutely excellent as ever, and yes, cycling is fabulous for mental health.. bike when you'¬Ä¬ôre happy, 
+bike when you'¬Ä¬ôre sad, shout at the rain, scream inwardly at a complex hill climb and get that endorphin rush from being outside.. 
+and smile at your fellow cyclists (and passing chickens, in my experience, a wee bwark at a chook makes many things better)"""
+
+result1 = ih.classify_text(discr_text)
+result2 = ih.classify_text(nondiscr_text)
+print(json.dumps(result1, indent=4))
+print(json.dumps(result2, indent=4))

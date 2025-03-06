@@ -1,19 +1,17 @@
 import streamlit as st
 import pandas as pd
-from annotated_text import annotated_text, annotation
+from annotated_text import annotated_text
 import time
-from random import randint, uniform
 from scripts.predict import InferenceHandler
-from pathlib import Path
-
-ROOT = Path(__file__).resolve().parents[0]
-st.write(ROOT)
-MODELS_DIR = ROOT / 'models'
-BIN_MODEL_PATH = MODELS_DIR / 'binary_classification'
-ML_MODEL_PATH = MODELS_DIR / 'multilabel_regression'
 
 history_df = pd.DataFrame(data=[], columns=['Text', 'Classification', 'Gender', 'Race', 'Sexuality', 'Disability', 'Religion', 'Unspecified'])
-ih = InferenceHandler(BIN_MODEL_PATH, ML_MODEL_PATH)
+rc = None
+ih = None
+entry = None
+
+@st.cache_data
+def load_inference_handler(api_token):
+    ih = InferenceHandler(api_token)
 
 def extract_data(json_obj):
     row_data = []
@@ -58,40 +56,38 @@ def output_results(res):
 
             if len(at_list) > 0:
                 annotated_text(at_list)
-                        
 
-# def test_results(text):
-#     test_val = int(randint(0, 1))
-#     res_obj = {
-#             'raw_text': text,
-#             'text_sentiment': 'Discriminatory' if test_val == 1 else 'Non-Discriminatory',
-#             'numerical_sentiment': test_val,
-#             'category_sentiments': {
-#                 'Gender': None if test_val == 0 else uniform(0.0, 1.0),
-#                 'Race': None if test_val == 0 else uniform(0.0, 1.0),
-#                 'Sexuality': None if test_val == 0 else uniform(0.0, 1.0),  
-#                 'Disability': None if test_val == 0 else uniform(0.0, 1.0),
-#                 'Religion': None if test_val == 0 else uniform(0.0, 1.0),  
-#                 'Unspecified': None if test_val == 0 else uniform(0.0, 1.0)
-#             }
-#         }
-#     return res_obj
-
-
+@st.cache_data
 def analyze_text(text):
-    res = None
-    with rc:
-        with st.spinner("Processing...", show_time=True) as spnr:
-            time.sleep(5)
-            res = ih.classify_text(text)
-            del spnr
+    if ih:
+        res = None
+        with rc:
+            with st.spinner("Processing...", show_time=True) as spnr:
+                time.sleep(5)
+                res = ih.classify_text(text)
+                del spnr
 
-    if res is not None:
-        st.session_state.results.append(res)
-        history_df.loc[-1] = extract_data(res)
-        output_results(res)
+        if res is not None:
+            st.session_state.results.append(res)
+            history_df.loc[-1] = extract_data(res)
+            output_results(res)
 
 st.title('NLPinitiative Text Classifier')
+
+st.sidebar.write("")
+API_KEY = st.sidebar.text_input(
+    "Enter your HuggingFace API Token",
+    help="You can get your free API token in your settings page: https://huggingface.co/settings/tokens",
+    type="password",
+)
+
+try:
+    if API_KEY is not None and len(API_KEY) > 0:
+        ih = InferenceHandler(API_KEY)
+except:
+    ih = None
+    st.error('Invalid Token')
+
 tab1, tab2 = st.tabs(['Classifier', 'About This App'])
 
 if "results" not in st.session_state:
@@ -102,20 +98,23 @@ load_history()
 with tab1:
     "Text Classifier for determining if entered text is discriminatory (and the categories of discrimination) or Non-Discriminatory."
 
-    with st.container():
-        with st.expander('History'):
-            st.write(history_df)
-
-        rc = st.container()
-
+    hist_container = st.container()
+    hist_expander = hist_container.expander('History')
+    rc = st.container()
+    
     text_form = st.form(key='classifier', clear_on_submit=True, enter_to_submit=True)
     with text_form:
-        text_area = st.text_area('Enter text to classify')
-        form_btn = st.form_submit_button('submit')
+        text_area = st.text_area('Enter text to classify', value='', disabled=True if ih is None else False)
+        form_btn = st.form_submit_button('submit', disabled=True if ih is None else False)
 
         if entry := text_area:
-            analyze_text(entry)
+            st.write(f'TEXT AREA: {entry}')
+            if entry and len(entry) > 0:
+                analyze_text(entry)
+                entry = None
 
+    with hist_expander:
+        st.dataframe(history_df)
 
 with tab2:
     st.markdown(

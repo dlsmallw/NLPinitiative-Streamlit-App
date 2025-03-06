@@ -10,6 +10,8 @@ numpy = "*"
 st-annotated-text = "*"
 transformers = "*"
 torch = "*"
+huggingface-hub = "*"
+joblib = "*"
 
 [dev-packages]
 
