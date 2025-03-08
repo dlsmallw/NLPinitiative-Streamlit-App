@@ -115,15 +115,3 @@ class InferenceHandler:
             results.append(max(0.0, item))
 
         return results
-
-ih = InferenceHandler('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')
-discr_text = """Islam is hell .  We Asian hate isalm...Islam bring only destruction..killing.  rape... rufugee.... Islam is hell .. Asian thought √∞¬ü¬ò¬Ç√∞¬ü¬ò¬Çsorry...but is true"""
-
-nondiscr_text = """Absolutely excellent as ever, and yes, cycling is fabulous for mental health.. bike when you'¬Ä¬ôre happy, 
-bike when you'¬Ä¬ôre sad, shout at the rain, scream inwardly at a complex hill climb and get that endorphin rush from being outside.. 
-and smile at your fellow cyclists (and passing chickens, in my experience, a wee bwark at a chook makes many things better)"""
-
-result1 = ih.classify_text(discr_text)
-result2 = ih.classify_text(nondiscr_text)
-print(json.dumps(result1, indent=4))
-print(json.dumps(result2, indent=4))
