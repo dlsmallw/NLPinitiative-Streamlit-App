@@ -2,12 +2,9 @@
 Script file used for performing inference with an existing model.
 """
 
-from pathlib import Path
 import torch
 import json
 import huggingface_hub
-import joblib
-from huggingface_hub.inference_api import InferenceApi
 
 from transformers import (
     AutoTokenizer,
