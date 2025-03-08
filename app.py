@@ -6,12 +6,13 @@ from scripts.predict import InferenceHandler
 
 history_df = pd.DataFrame(data=[], columns=['Text', 'Classification', 'Gender', 'Race', 'Sexuality', 'Disability', 'Religion', 'Unspecified'])
 rc = None
-ih = None
-entry = None
 
 @st.cache_data
 def load_inference_handler(api_token):
-    ih = InferenceHandler(api_token)
+    try:
+        return InferenceHandler(api_token)
+    except:
+        return None
 
 def extract_data(json_obj):
     row_data = []
@@ -59,6 +60,7 @@ def output_results(res):
 
 @st.cache_data
 def analyze_text(text):
+    st.write(f'Text: {text}')
     if ih:
         res = None
         with rc:
@@ -80,13 +82,7 @@ API_KEY = st.sidebar.text_input(
     help="You can get your free API token in your settings page: https://huggingface.co/settings/tokens",
     type="password",
 )
-
-try:
-    if API_KEY is not None and len(API_KEY) > 0:
-        ih = InferenceHandler(API_KEY)
-except:
-    ih = None
-    st.error('Invalid Token')
+ih = load_inference_handler(API_KEY)
 
 tab1, tab2 = st.tabs(['Classifier', 'About This App'])
 
@@ -100,21 +96,19 @@ with tab1:
 
     hist_container = st.container()
     hist_expander = hist_container.expander('History')
+
     rc = st.container()
-    
     text_form = st.form(key='classifier', clear_on_submit=True, enter_to_submit=True)
     with text_form:
+        entry = None
         text_area = st.text_area('Enter text to classify', value='', disabled=True if ih is None else False)
         form_btn = st.form_submit_button('submit', disabled=True if ih is None else False)
-
-        if entry := text_area:
-            st.write(f'TEXT AREA: {entry}')
-            if entry and len(entry) > 0:
-                analyze_text(entry)
-                entry = None
+        if form_btn and text_area is not None and len(text_area) > 0:
+            analyze_text(text_area)
 
     with hist_expander:
-        st.dataframe(history_df)
+        st.dataframe(history_df, hide_index=True)
+    
 
 with tab2:
     st.markdown(
