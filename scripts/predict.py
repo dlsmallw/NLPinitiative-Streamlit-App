@@ -11,8 +11,8 @@ from transformers import (
     AutoModelForSequenceClassification
 )
 
-BIN_REPO = 'dlsmallw/Binary-Classification-testing'
-ML_REPO = 'dlsmallw/Multilabel-Regression-testing'
+BIN_REPO = 'dlsmallw/NLPinitiative-Binary-Classification'
+ML_REPO = 'dlsmallw/NLPinitiative-Multilabel-Regression'
 
 ## Class used to encapsulate and handle the logic for inference
 class InferenceHandler:
