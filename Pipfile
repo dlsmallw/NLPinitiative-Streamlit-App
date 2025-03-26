@@ -12,6 +12,9 @@ transformers = "*"
 torch = "*"
 huggingface-hub = "*"
 joblib = "*"
+nltk = "*"
+htbuilder = "*"
+nest-asyncio = "*"
 
 [dev-packages]
 

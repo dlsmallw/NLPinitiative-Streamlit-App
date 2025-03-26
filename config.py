@@ -15,8 +15,9 @@ BIN_MODEL_PATH = MODELS_DIR / 'binary_classification'
 ML_MODEL_PATH = MODELS_DIR / 'multilabel_regression'
 
 # HF Hub Repositories
-BIN_REPO = 'dlsmallw/Binary-Classification-testing'
-ML_REPO = 'dlsmallw/Multilabel-Regression-testing'
+BIN_REPO = 'dlsmallw/NLPinitiative-Binary-Classification'
+ML_REPO = 'dlsmallw/NLPinitiative-Multilabel-Regression'
+DATASET_REPO = 'dlsmallw/NLPinitiative-Dataset'
 
 BIN_API_URL = f"https://api-inference.huggingface.co/models/{BIN_REPO}"
 ML_API_URL = f"https://api-inference.huggingface.co/models/{ML_REPO}"
