@@ -19,6 +19,10 @@ clean() {
 	find . -type d -name "__pycache__" -delete
 }
 
+requirements() {
+    pipenv requirements > requirements.txt
+}
+
 # docs() {
 #     case $1 in
 #         build)
