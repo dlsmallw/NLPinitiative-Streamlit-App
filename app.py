@@ -104,7 +104,8 @@ def build_result_tree(parent_elem, results):
         sent_details.append(sent_res)
 
     with parent_elem:
-        st.markdown(f'### Results - {':red[Detected Discriminatory Sentiment]' if discriminatory_sentiment else ':green[No Discriminatory Sentiment Detected]'}')
+        result_hdr = ':red[Detected Discriminatory Sentiment]' if discriminatory_sentiment else ':green[No Discriminatory Sentiment Detected]'
+        st.markdown(f'### Results - {result_hdr}')
         with st.container(border=True):
             st.markdown('<hr style="margin: 0.5em 0 0 0;">', unsafe_allow_html=True)
             st.markdown(
