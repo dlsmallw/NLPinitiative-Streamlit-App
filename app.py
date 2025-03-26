@@ -88,7 +88,7 @@ def build_result_tree(parent_elem, results):
 
         sent_res = {
             'sentence': sentence,
-            'classification': f'{':red' if pred_class else ':green'}[{bin_class}]',
+            'classification': f'{":red" if pred_class else ":green"}[{bin_class}]',
             'annotated_categories': []
         }
 
