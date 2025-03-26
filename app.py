@@ -125,7 +125,9 @@ def build_result_tree(parent_elem, results):
                                 unsafe_allow_html=True
                             )
                             st.markdown('<hr style="margin: 0 0 0.5em 0;">', unsafe_allow_html=True)
-                            st.markdown(f'##### Classification - {sent['classification']}')
+                            
+                            classification = sent['classification']
+                            st.markdown(f'##### Classification - {classification}')
 
                             if len(sent['annotated_categories']) > 0:
                                 st.markdown(
