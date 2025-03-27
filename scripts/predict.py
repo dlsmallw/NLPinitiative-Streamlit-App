@@ -16,23 +16,53 @@ from transformers import (
 BIN_REPO = 'dlsmallw/NLPinitiative-Binary-Classification'
 ML_REPO = 'dlsmallw/NLPinitiative-Multilabel-Regression'
 
-## Class used to encapsulate and handle the logic for inference
 class InferenceHandler:
-    def __init__(self, api_token):
+    """A class that handles performing inference using the trained binary classification and multilabel regression models."""
+
+    def __init__(self, api_token: str):
+        """Constructor for instantiating an InferenceHandler object.
+
+        Parameters
+        ----------
+        api_token : str
+            A Hugging Face token with read/write access privileges to allow exporting the trained models (default is None).
+        """
+
         self.api_token = api_token
-        self.bin_tokenizer, self.bin_model = self.init_model_and_tokenizer(BIN_REPO)
-        self.ml_regr_tokenizer, self.ml_regr_model = self.init_model_and_tokenizer(ML_REPO)
+        self.bin_tokenizer, self.bin_model = self._init_model_and_tokenizer(BIN_REPO)
+        self.ml_regr_tokenizer, self.ml_regr_model = self._init_model_and_tokenizer(ML_REPO)
         nltk.download('punkt_tab')
 
-    def get_config(self, repo_id):
+    def _get_config(self, repo_id: str) -> str:
+        """Retrieves the config.json file from the specified model repository.
+
+        Parameters
+        ----------
+        repo_id : str
+            The repository id (i.e., <owner username>/<repository name>).
+        
+        """
+
         config = None
         if repo_id and self.api_token:
             config = huggingface_hub.hf_hub_download(repo_id, filename='config.json', token=self.api_token)
         return config
 
-    ## Initializes a model and tokenizer for use in inference using the models path
-    def init_model_and_tokenizer(self, repo_id):
-        config = self.get_config(repo_id)
+    def _init_model_and_tokenizer(self, repo_id: str):
+        """Initializes a model and tokenizer for use in inference using the models path.
+
+        Parameters
+        ----------
+        model_path : Path
+            Directory path to the models tensor file.
+
+        Returns
+        -------
+        tuple[PreTrainedTokenizer | PreTrainedTokenizerFast, PreTrainedModel]
+            A tuple containing the tokenizer and model objects.
+        """
+
+        config = self._get_config(repo_id)
         with open(config) as config_file:
             config_json = json.load(config_file)
         model_name = config_json['_name_or_path']
@@ -43,24 +73,75 @@ class InferenceHandler:
         model.eval()
         return tokenizer, model
 
-    ## Handles logic used to encode the text for use in binary classification
-    def encode_binary(self, text):
+    def _encode_binary(self, text: str):
+        """Preprocesses and tokenizes the input text for binary classification.
+
+        Parameters
+        ----------
+        text : str
+            The input text to be preprocessed and tokenized.
+
+        Returns
+        -------
+        BatchEncoding
+            The preprocessed and tokenized input text.
+        """
+
         bin_tokenized_input = self.bin_tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=512)
         return bin_tokenized_input
 
-    ## Handles logic used to encode the text for use in multilabel regression
-    def encode_multilabel(self, text):
+    def _encode_multilabel(self, text: str):
+        """Preprocesses and tokenizes the input text for multilabel regression.
+
+        Parameters
+        ----------
+        text : str
+            The input text to be preprocessed and tokenized.
+
+        Returns
+        -------
+        BatchEncoding
+            The preprocessed and tokenized input text.
+        """
+
         ml_tokenized_input = self.ml_regr_tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=512)
         return ml_tokenized_input
 
-    ## Handles text encoding for both binary classification and multilabel regression
-    def encode_input(self, text):
-        bin_inputs = self.encode_binary(text)
-        ml_inputs = self.encode_multilabel(text)
+    def _encode_input(self, text: str):
+        """Preprocesses and tokenizes the input text sentiment classification (both models).
+
+        Parameters
+        ----------
+        text : str
+            The input text to be preprocessed and tokenized.
+
+        Returns
+        -------
+        tuple[BatchEncoding, BatchEncoding]
+            A tuple containing preprocessed and tokenized input text for both the binary and multilabel regression models.
+        """
+
+        bin_inputs = self._encode_binary(text)
+        ml_inputs = self._encode_multilabel(text)
         return bin_inputs, ml_inputs
     
-    ## Handles performing the full sentiment analysis (binary classification and multilabel regression)
-    def classify_text(self, input):
+    def classify_text(self, input: str):
+        """Performs inference on the input text to determine the binary classification and the multilabel regression for the categories.
+
+        Determines whether the text is discriminatory. If it is discriminatory, it will then perform regression on the input text to determine the
+        assesed percentage that each category applies.
+
+        Parameters
+        ----------
+        input : str
+            The input text to be classified.
+
+        Returns
+        -------
+        dict[str, Any]
+            The resulting classification and regression values for each category.
+        """
+
         result = {
             'text_input': input,
             'results': []
@@ -100,9 +181,21 @@ class InferenceHandler:
         result['results'] = sent_res_arr
         return result
     
-    ## Handles logic for checking the binary classfication of the text 
-    def discriminatory_inference(self, text):
-        bin_inputs = self.encode_binary(text)
+    def discriminatory_inference(self, text: str):
+        """Performs inference on the input text to determine the binary classification.
+
+        Parameters
+        ----------
+        text : str
+            The input text to be classified.
+
+        Returns
+        -------
+        tuple[str, Number]
+            A tuple consisting of the string classification (Discriminatory or Non-Discriminatory) and the numeric prediction class (1 or 0).
+        """
+
+        bin_inputs = self._encode_binary(text)
 
         with torch.no_grad():
             bin_logits = self.bin_model(**bin_inputs).logits
@@ -114,9 +207,21 @@ class InferenceHandler:
 
         return bin_text_pred, pred_class
     
-    ## Handles logic for assessing the categories of discrimination
-    def category_inference(self, text):
-        ml_inputs = self.encode_multilabel(text)
+    def category_inference(self, text: str):
+        """Performs inference on the input text to determine the regression values for the categories of discrimination.
+
+        Parameters
+        ----------
+        text : str
+            The input text to be classified.
+
+        Returns
+        -------
+        list[float]
+            A tuple consisting of the string classification (Discriminatory or Non-Discriminatory) and the numeric prediction class (1 or 0).
+        """
+
+        ml_inputs = self._encode_multilabel(text)
 
         with torch.no_grad():
             ml_outputs = self.ml_regr_model(**ml_inputs).logits

@@ -1,0 +1,15 @@
+site_name: NLPinitiative Streamlit Documentation 
+
+nav:
+  - Home: index.md
+
+theme:
+  name: readthedocs
+
+plugins:
+- search
+- mkdocstrings:
+    handlers:
+      python:
+        options:
+          docstring_style: numpy

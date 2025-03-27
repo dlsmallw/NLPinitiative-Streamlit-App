@@ -23,16 +23,16 @@ requirements() {
     pipenv requirements > requirements.txt
 }
 
-# docs() {
-#     case $1 in
-#         build)
-#             mkdocs build
-#             ;;
-#         serve)
-#             mkdocs serve
-#             ;;
-#         *)
-#             log_error "Specify 'build' or 'serve'. For example: docs build"
-#             ;;
-#     esac
-# }
+docs() {
+    case $1 in
+        build)
+            mkdocs build
+            ;;
+        serve)
+            mkdocs serve
+            ;;
+        *)
+            log_error "Specify 'build' or 'serve'. For example: docs build"
+            ;;
+    esac
+}
