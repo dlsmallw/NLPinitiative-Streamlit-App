@@ -1,1 +1,1 @@
-import config
+import scripts.config as config

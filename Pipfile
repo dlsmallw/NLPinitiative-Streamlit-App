@@ -10,13 +10,15 @@ numpy = "*"
 st-annotated-text = "*"
 transformers = "*"
 torch = "*"
-huggingface-hub = "*"
 joblib = "*"
 nltk = "*"
 htbuilder = "*"
 nest-asyncio = "*"
 mkdocs = "*"
 mkdocstrings-python = "*"
+typer = "*"
+huggingface-hub = "*"
+loguru = "*"
 
 [dev-packages]
 

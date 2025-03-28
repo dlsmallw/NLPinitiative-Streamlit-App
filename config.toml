@@ -1,0 +1,4 @@
+[repositories]
+bin_repo = "dlsmallw/NLPinitiative-Binary-Classification"
+ml_repo = "dlsmallw/NLPinitiative-Multilabel-Regression"
+ds_repo = "dlsmallw/NLPinitiative-Dataset"

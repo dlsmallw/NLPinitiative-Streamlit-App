@@ -36,3 +36,35 @@ docs() {
             ;;
     esac
 }
+
+set() {
+    if [[ $# -lt 2 ]]; then
+        echo "Command Requires Two Arguments."
+    else
+        case $1 in
+            bin_repo)
+                python ./scripts/config.py -b "$2"
+                ;;
+            ml_repo)
+                python ./scripts/config.py -m "$2"
+                ;;
+            ds_repo)
+                python ./scripts/config.py -d "$2"
+                ;;
+            *)
+                log_error "Specify 'bin_repo', 'ml_repo' or 'ds_repo'. For example: set bin_repo <repo id>"
+                ;;
+        esac
+    fi
+}
+
+run() {
+    case $1 in
+        dev)
+            streamlit run app.py
+            ;;
+        *)
+            log_error "Specify 'dev'. For example: run dev"
+            ;;
+    esac
+}
