@@ -1,10 +1,36 @@
 # NLPinitiative Streamlit Documentation 
 
+Codebase for the Streamlit app hosted on Hugging Face Spaces that provides a basic user interface for performing inference on text input by the user using the models training within the NLPinitiative project.
+
 ---
 
 ## Project Details
 
 ### Description
+
+The NLPinitiative Discriminatory Text Classifier is an advanced natural language processing tool designed to detect and flag potentially discriminatory or harmful language. By analyzing text for biased, offensive, or exclusionary content, this classifier helps promote more inclusive and respectful communication. Simply enter your text below, and the model will assess it based on linguistic patterns and context. While the tool provides valuable insights, we encourage users to review flagged content thoughtfully and consider context when interpreting results.
+
+This project was developed as part of a sponsored project for the **<a href="https://www.j-initiative.org/" style="text-decoration:none">The J-Healthcare Initiative</a>** for the purpose of detecting discriminatory speech from public officials and news agencies targetting marginalized communities communities.
+
+---
+
+### How The Tool Works
+
+The application utilizes two fine-tuned NLP models: 
+
+- A binary classifier for classifying input as Discriminatory or Non-Discriminatory (prediction classes of 1 and 0 respectively).
+- A multilabel regression model for assessing the likelihood of specific categories of discrimination 
+   (Gender, Race, Sexuality, Disability, Religion and Unspecified) from a value of 0.0 (no confidence) and 1.0 (max confidence).
+
+Both models are use the pretrained **<a href="https://doi.org/10.48550/arXiv.1810.04805" style="text-decoration:none">BERT</a>** (Bidirectional Encoder Representations from Transformers) as the base model, which was trained using the master dataset (which can be viewed on the Datasets tab). The master dataset includes data extractedand reformatted for use in training these models from the **<a href="https://github.com/intelligence-csd-auth-gr/Ethos-Hate-Speech-Dataset" style="text-decoration:none">ETHOS dataset</a>** and the **<a href="https://github.com/marcoguerini/CONAN?tab=readme-ov-file#multitarget-conan" style="text-decoration:none">Multitarget-CONAN dataset</a>**.
+
+---
+
+### Project Links
+* **<a href="https://github.com/dlsmallw/NLPinitiative" style="text-decoration:none"><img src="https://raw.githubusercontent.com/tandpfun/skill-icons/refs/heads/main/icons/Github-Dark.svg" style="margin-right: 3px;" width="20" height="20"/> NLPinitiative GitHub Project</a>**  - The training/evaluation pipeline used for fine-tuning the models.
+* **<a href="https://huggingface.co/{BIN_REPO}" style="text-decoration:none">🤗 NLPinitiative HF Binary Classification Model Repository</a>** - The Hugging Face hosted Binary Classification Model Repository.
+* **<a href="https://huggingface.co/{ML_REPO}" style="text-decoration:none">🤗 NLPinitiative HF Multilabel Regression Model Repository</a>** - The Hugging Face hosted Multilabel Regression Model Repository.
+* **<a href="https://huggingface.co/{DATASET_REPO}" style="text-decoration:none">🤗 NLPinitiative HF Dataset Repository</a>** - The Hugging Face hosted Dataset Repository.
 
 Codebase for the Streamlit app hosted on Hugging Face Spaces that provides a basic user interface for performing inference on text input by the user using the models training within the NLPinitiative project.
 
