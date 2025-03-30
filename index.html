@@ -47,7 +47,17 @@
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#description">Description</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#how-the-tool-works">How The Tool Works</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#project-links">Project Links</a>
+    </li>
     <li class="toctree-l3"><a class="reference internal" href="#project-setup">Project Setup</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#commands">Commands</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#hf-spaces-setup">HF Spaces Setup</a>
+    </li>
+        </ul>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#project-layout">Project layout</a>
     </li>
@@ -80,13 +90,60 @@
             <div class="section" itemprop="articleBody">
               
                 <h1 id="nlpinitiative-streamlit-documentation">NLPinitiative Streamlit Documentation</h1>
+<p>Codebase for the Streamlit app hosted on Hugging Face Spaces that provides a basic user interface for performing inference on text input by the user using the models training within the NLPinitiative project.</p>
 <hr />
 <h2 id="project-details">Project Details</h2>
 <h3 id="description">Description</h3>
+<p>The NLPinitiative Discriminatory Text Classifier is an advanced natural language processing tool designed to detect and flag potentially discriminatory or harmful language. By analyzing text for biased, offensive, or exclusionary content, this classifier helps promote more inclusive and respectful communication. Simply enter your text below, and the model will assess it based on linguistic patterns and context. While the tool provides valuable insights, we encourage users to review flagged content thoughtfully and consider context when interpreting results.</p>
+<p>This project was developed as part of a sponsored project for the <strong><a href="https://www.j-initiative.org/" style="text-decoration:none">The J-Healthcare Initiative</a></strong> for the purpose of detecting discriminatory speech from public officials and news agencies targetting marginalized communities communities.</p>
+<hr />
+<h3 id="how-the-tool-works">How The Tool Works</h3>
+<p>The application utilizes two fine-tuned NLP models: </p>
+<ul>
+<li>A binary classifier for classifying input as Discriminatory or Non-Discriminatory (prediction classes of 1 and 0 respectively).</li>
+<li>A multilabel regression model for assessing the likelihood of specific categories of discrimination 
+   (Gender, Race, Sexuality, Disability, Religion and Unspecified) from a value of 0.0 (no confidence) and 1.0 (max confidence).</li>
+</ul>
+<p>Both models are use the pretrained <strong><a href="https://doi.org/10.48550/arXiv.1810.04805" style="text-decoration:none">BERT</a></strong> (Bidirectional Encoder Representations from Transformers) as the base model, which was trained using the master dataset (which can be viewed on the Datasets tab). The master dataset includes data extractedand reformatted for use in training these models from the <strong><a href="https://github.com/intelligence-csd-auth-gr/Ethos-Hate-Speech-Dataset" style="text-decoration:none">ETHOS dataset</a></strong> and the <strong><a href="https://github.com/marcoguerini/CONAN?tab=readme-ov-file#multitarget-conan" style="text-decoration:none">Multitarget-CONAN dataset</a></strong>.</p>
+<hr />
+<h3 id="project-links">Project Links</h3>
+<ul>
+<li><strong><a href="https://github.com/dlsmallw/NLPinitiative" style="text-decoration:none"><img src="https://raw.githubusercontent.com/tandpfun/skill-icons/refs/heads/main/icons/Github-Dark.svg" style="margin-right: 3px;" width="20" height="20"/> NLPinitiative GitHub Project</a></strong>  - The training/evaluation pipeline used for fine-tuning the models.</li>
+<li><strong><a href="https://huggingface.co/{BIN_REPO}" style="text-decoration:none">🤗 NLPinitiative HF Binary Classification Model Repository</a></strong> - The Hugging Face hosted Binary Classification Model Repository.</li>
+<li><strong><a href="https://huggingface.co/{ML_REPO}" style="text-decoration:none">🤗 NLPinitiative HF Multilabel Regression Model Repository</a></strong> - The Hugging Face hosted Multilabel Regression Model Repository.</li>
+<li><strong><a href="https://huggingface.co/{DATASET_REPO}" style="text-decoration:none">🤗 NLPinitiative HF Dataset Repository</a></strong> - The Hugging Face hosted Dataset Repository.</li>
+</ul>
 <p>Codebase for the Streamlit app hosted on Hugging Face Spaces that provides a basic user interface for performing inference on text input by the user using the models training within the NLPinitiative project.</p>
 <hr />
 <h3 id="project-setup">Project Setup</h3>
-<p><strong>Setup for Pushing to GitHub and HF Space</strong>:</p>
+<p>For the purposes of building and running the project for development, a bash script <code>setup.sh</code> has been created to make the process of performing various development operations (defined below). Use of this script will require use of a bash shell (git bash for windows users).</p>
+<p>This script can be activated by using <code>source ./setup.sh</code> while within the project source directory.</p>
+<h4 id="commands">Commands</h4>
+<ul>
+<li><code>build</code>: This will setup a virtual environment within the project source directory and install all necessary dependencies for development.</li>
+<li><code>clean</code>: This will deactivate the virutal environment, and remove the .venv directory (uninstalling all dependencies).</li>
+<li><code>requirements</code> - <em>Important when pushing the codebase to the HF Space</em>: This will generate/update the <code>requirements.txt</code> file containing the required dependencies for the project.<ul>
+<li>This is required for the HF space to properly download dependencies due to using <code>pip</code> for initializing the application.</li>
+</ul>
+</li>
+<li><code>docs build</code>: Parses the docstrings in the project and generates the project documentation using mkdocs.</li>
+<li><code>docs serve</code>: Serves the mkdocs documentation to a local dev server that can be opened in a browser.</li>
+<li><code>docs deploy</code>: Deploys the mkdocs documentation to the linked GitHub repositories 'GitHub Pages'.</li>
+<li><code>run dev</code>: Runs the Streamlit application locally for monitored development.</li>
+<li><code>set bin_repo &lt;HF Model Repository&gt;</code>: Sets the binary model repository ID to the specified string.<ul>
+<li>This is the source for downloading the model tensor file.</li>
+</ul>
+</li>
+<li><code>set ml_repo &lt;HF Model Repository&gt;</code>: Sets the multilabel regression model repository ID to the specified string.<ul>
+<li>This is the source for downloading the model tensor file.</li>
+</ul>
+</li>
+<li><code>set ds_repo &lt;HF Dataset Repository&gt;</code>: Sets the dataset repository ID to the specified string.<ul>
+<li>This is the source for downloading the datasets.</li>
+</ul>
+</li>
+</ul>
+<h4 id="hf-spaces-setup">HF Spaces Setup</h4>
 <p>Due to the project being configured to use hugging face spaces to host the python web-app, the instructions will outline how to setup the project to push to any newly created Hugging Face Space.</p>
 <p><strong>Note</strong>: Streamlit can still be developed and deployed to environments other than Hugging Face Spaces. Refer to the appropriate documentation associated with a chosen hosting service for how to deploy the web-app to the services environment.</p>
 <p><strong>After Creation of a Streamlit Hugging Face Space</strong>:</p>
@@ -104,10 +161,11 @@
 <pre><code>├── docs                &lt;- A directory containing documentation used for generating and serving 
 │                          project documentation
 ├── scripts             &lt;- Source code for model inference               
-│      ├── __init__.py         &lt;- Makes modeling a Python module        
+│      ├── __init__.py         &lt;- Makes modeling a Python module    
+│      ├── config.py           &lt;- Store useful variables and configuration
 │      └── predict.py          &lt;- Code to run model inference with trained models
 ├── app.py              &lt;- Entry point for the application
-├── config.py           &lt;- Store useful variables and configuration
+├── config.toml         &lt;- Stores HF repository information
 ├── LICENSE             &lt;- Open-source license if one is chosen
 ├── mkdocs.yml          &lt;- mkdocs project configuration
 ├── Pipfile             &lt;- The project dependency file for reproducing the analysis environment, 
@@ -160,5 +218,5 @@
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2025-03-28 06:07:07.438131+00:00
+Build Date UTC : 2025-03-30 05:05:52.651661+00:00
 -->
