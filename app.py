@@ -331,7 +331,7 @@ with tab2:
         * **<a href="https://github.com/dlsmallw/NLPinitiative" style="text-decoration:none"><img src="https://raw.githubusercontent.com/tandpfun/skill-icons/refs/heads/main/icons/Github-Dark.svg" style="margin-right: 3px;" width="20" height="20"/> NLPinitiative GitHub Project</a>**  - The training/evaluation pipeline used for fine-tuning the models.
         * **<a href="https://huggingface.co/{BIN_REPO}" style="text-decoration:none">🤗 NLPinitiative HF Binary Classification Model Repository</a>** - The Hugging Face hosted Binary Classification Model Repository.
         * **<a href="https://huggingface.co/{ML_REPO}" style="text-decoration:none">🤗 NLPinitiative HF Multilabel Regression Model Repository</a>** - The Hugging Face hosted Multilabel Regression Model Repository.
-        * **<a href="https://huggingface.co/{DATASET_REPO}" style="text-decoration:none">🤗 NLPinitiative HF Dataset Repository</a>** - The Hugging Face hosted Dataset Repository.
+        * **<a href="https://huggingface.co/datasets/{DATASET_REPO}" style="text-decoration:none">🤗 NLPinitiative HF Dataset Repository</a>** - The Hugging Face hosted Dataset Repository.
 
         <hr style="margin: 0 0 0.5em 0;">
 
