@@ -3,18 +3,18 @@ Script file used for performing inference with an existing model.
 """
 
 import torch
-import json
 import nltk
 from nltk.tokenize import sent_tokenize
-import huggingface_hub
 
 from transformers import (
     AutoTokenizer,
     AutoModelForSequenceClassification
 )
 
-BIN_REPO = 'dlsmallw/NLPinitiative-Binary-Classification'
-ML_REPO = 'dlsmallw/NLPinitiative-Multilabel-Regression'
+from scripts.config import (
+    BIN_REPO,
+    ML_REPO
+)
 
 class InferenceHandler:
     """A class that handles performing inference using the trained binary classification and multilabel regression models."""
@@ -33,28 +33,13 @@ class InferenceHandler:
         self.ml_regr_tokenizer, self.ml_regr_model = self._init_model_and_tokenizer(ML_REPO)
         nltk.download('punkt_tab')
 
-    def _get_config(self, repo_id: str) -> str:
-        """Retrieves the config.json file from the specified model repository.
-
-        Parameters
-        ----------
-        repo_id : str
-            The repository id (i.e., <owner username>/<repository name>).
-        
-        """
-
-        config = None
-        if repo_id and self.api_token:
-            config = huggingface_hub.hf_hub_download(repo_id, filename='config.json', token=self.api_token)
-        return config
-
     def _init_model_and_tokenizer(self, repo_id: str):
         """Initializes a model and tokenizer for use in inference using the models path.
 
         Parameters
         ----------
-        model_path : Path
-            Directory path to the models tensor file.
+        repo_id : str
+            The repository id (i.e., <owner username>/<repository name>).
 
         Returns
         -------
@@ -62,14 +47,8 @@ class InferenceHandler:
             A tuple containing the tokenizer and model objects.
         """
 
-        config = self._get_config(repo_id)
-        with open(config) as config_file:
-            config_json = json.load(config_file)
-        model_name = config_json['_name_or_path']
-
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        tokenizer = AutoTokenizer.from_pretrained(repo_id, token=self.api_token)
         model = AutoModelForSequenceClassification.from_pretrained(repo_id, token=self.api_token)
-
         model.eval()
         return tokenizer, model
 

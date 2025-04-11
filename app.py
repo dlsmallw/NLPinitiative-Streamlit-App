@@ -85,10 +85,7 @@ def load_inference_handler(api_token: str) -> InferenceHandler | None:
         Returns an instance of the InferenceHandler class if a valid token is entered, otherwise returns None.
     """
 
-    try:
-        return InferenceHandler(api_token)
-    except:
-        return None
+    return InferenceHandler(api_token)
 
 def build_result_tree(parent_elem, results: dict):
     """Loads the history of results from inference for previous inputs made by the user.
@@ -195,11 +192,10 @@ def analyze_text(input: str):
     input : str
         The text to analyze.
     """
-    if ih:
+    if ih is not None:
         res = None
         with rc:
             with st.spinner("Processing...", show_time=True) as spnr:
-                # time.sleep(5)
                 res = ih.classify_text(input)
                 del spnr
 
@@ -209,8 +205,8 @@ def analyze_text(input: str):
 
 @st.cache_data
 def load_datasets(_parent_elem, api_token: str):
-    if api_token is None or len(api_token) == 0:
-        raise Exception()
+    # if api_token is None or len(api_token) == 0:
+    #     raise Exception()
 
     cache_path = snapshot_download(repo_id=DATASET_REPO, repo_type='dataset', token=api_token)
     ds_record = pd.read_csv(os.path.join(cache_path, 'dataset_record.csv'))
@@ -263,13 +259,23 @@ def load_datasets(_parent_elem, api_token: str):
 
 st.title('NLPinitiative Text Classifier')
 
-st.sidebar.write("")
-API_KEY = st.sidebar.text_input(
-    "Enter your HuggingFace API Token",
-    help="You can get your free API token in your settings page: https://huggingface.co/settings/tokens",
-    type="password",
-)
-ih = load_inference_handler(API_KEY)
+# st.sidebar.write("")
+# API_KEY = st.sidebar.text_input(
+#     "Enter your HuggingFace API Token",
+#     help="You can get your free API token in your settings page: https://huggingface.co/settings/tokens",
+#     type="password",
+# )
+
+# if API_KEY is not None and len(API_KEY) > 0:
+#     try:
+#         ih = load_inference_handler(API_KEY)
+#     except Exception as e:
+#         ih = None
+#         st.sidebar.write(f'Failed to load inference handler: {e}')
+# else:
+#     ih = None
+
+ih = InferenceHandler(None)
 
 tab1 = st.empty()
 tab2 = st.empty()
@@ -354,7 +360,7 @@ with tab3:
 with tab4:
     ds_container = st.container(border=True)
     try:
-        load_datasets(ds_container, API_KEY)
+        load_datasets(ds_container, None)
     except Exception as e:
         logger.error(f'{e}')
         ds_container.markdown(
